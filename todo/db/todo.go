@@ -153,11 +153,13 @@ func (t *ToDo) AddItem(item ToDoItem) error {
 	//If everything there are no errors, this function should return nil
 	//at the end to indicate that the item was properly added to the
 	//database.
-	t.loadDB()
-	fmt.Print(t.toDoMap)
+	errLoad := t.loadDB()
+	if errLoad != nil {
+		return errLoad
+	}
 	_, err := t.toDoMap[item.Id]
 	if err {
-		return errors.New("The value for " + strconv.Itoa(item.Id)+ " already exists in database")
+		return errors.New("The value for " + strconv.Itoa(item.Id)+ " already exists in database.  Use update instead!")
 	}
 	t.toDoMap[item.Id] = item
 	t.saveDB()
@@ -190,7 +192,17 @@ func (t *ToDo) DeleteItem(id int) error {
 	//return nil at the end to indicate that the item was properly deleted
 	//from the database.
 
-	return errors.New("DeleteItem() is currently not implemented")
+	errLoad := t.loadDB()
+	if errLoad != nil {
+		return errLoad
+	}
+	_, err := t.toDoMap[id]
+	if err {
+		return errors.New("The item with ID " + strconv.Itoa(id) + " does not exist and cannot be deleted")
+	}
+	delete(t.toDoMap, id)
+	t.saveDB()
+	return nil
 }
 
 // UpdateItem accepts a ToDoItem and updates it in the DB.
@@ -218,8 +230,17 @@ func (t *ToDo) UpdateItem(item ToDoItem) error {
 	//any errors, return them, as appropriate.  If everything there are
 	//no errors, this function should return nil at the end to indicate
 	//that the item was properly updated in the database.
-
-	return errors.New("UpdateItem() is currently not implemented")
+	errLoad := t.loadDB()
+	if errLoad != nil {
+		return errLoad
+	}
+	_, err := t.toDoMap[item.Id]
+	if err {
+		return errors.New("The item with ID " + strconv.Itoa(item.Id) + " does not exist and cannot be updated")
+	}
+	t.toDoMap[item.Id] = item
+	t.saveDB()
+	return nil
 }
 
 // GetItem accepts an item id and returns the item from the DB.
@@ -248,8 +269,16 @@ func (t *ToDo) GetItem(id int) (ToDoItem, error) {
 	//no errors, this function should return the item requested and nil
 	//as the error value the end to indicate that the item was
 	//properly returned from the database.
-
-	return ToDoItem{}, errors.New("GetItem() is currently not implemented")
+	errLoad := t.loadDB()
+	if errLoad != nil {
+		return ToDoItem{} , errLoad
+	}
+	_, err := t.toDoMap[id]
+	if err {
+		return ToDoItem{}, errors.New("The item with ID " + strconv.Itoa(id) + " does not exist and cannot be retrieved")
+	}
+	
+	return t.toDoMap[id], nil
 }
 
 // GetAllItems returns all items from the DB.  If successful it
@@ -273,8 +302,15 @@ func (t *ToDo) GetAllItems() ([]ToDoItem, error) {
 	//use the built in append() function in go to add an item in a slice.
 	//Finally, if there were no errors along the way, return the slice
 	//and nil as the error value.
-
-	return nil, errors.New("GetAllItems() is currently not implemented")
+	var listOfItems []ToDoItem 
+	err := t.loadDB()
+	if err != nil {
+		return listOfItems, err
+	}
+	for _, value := range t.toDoMap {
+		listOfItems = append(listOfItems, value)
+	}
+	return listOfItems, nil
 }
 
 // PrintItem accepts a ToDoItem and prints it to the console
@@ -336,7 +372,17 @@ func (t *ToDo) ChangeItemDoneStatus(id int, value bool) error {
 	//in the DB (after the status is changed).  If there are any
 	//errors along the way, return them.  If everything is successful
 	//return nil at the end to indicate that the item was properly
-
+	errLoad := t.loadDB()
+	if errLoad != nil {
+		return errLoad
+	}
+	item, err := t.GetItem(id)
+	if err != nil {
+		return err
+	}
+	item.IsDone = value
+	t.UpdateItem(item)
+	t.saveDB()
 	return errors.New("ChangeItemDoneStatus() is currently not implemented")
 }
 
