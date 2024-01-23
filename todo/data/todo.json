@@ -1,5 +1,10 @@
 [
   {
+    "id": 1,
+    "title": "Learn Go / GoLang",
+    "done": false
+  },
+  {
     "id": 2,
     "title": "Learn Kubernetes",
     "done": false
@@ -13,25 +18,5 @@
     "id": 4,
     "title": "Learn Why Professor Mitchell is the BEST! :-)",
     "done": false
-  },
-  {
-    "id": 999,
-    "title": "This is a test case item",
-    "done": false
-  },
-  {
-    "id": -4796419607052650164,
-    "title": "hXhlYS",
-    "done": true
-  },
-  {
-    "id": 103,
-    "title": "Designer",
-    "done": true
-  },
-  {
-    "id": 1,
-    "title": "Learn Go / GoLang",
-    "done": true
   }
 ]

@@ -57,12 +57,12 @@ const (
 //						   use it.  See github.com/spf13/cobra for information
 //						   on how to use it.
 //
-//	 YOUR ANSWER: First this package sets up command line arguments that are potentially expected to be passed through
+//	 YOUR ANSWER: First this package sets up command line arguments that are potentially expected to be passed through (-db, -restore, -l (list), etc)
 //    For instance flag.StringVar(), gives the varialbe to assign the passed in value, the name to call, a default value (.data/todo.json),
 //    if nothing is passed in and a description to print out for a help.  It does that for other variable names and types.
-//    Next it checks for if there are any extra arguments besides the executable given, if not print out the Usage/Help section (descriptions).
-//    Next it runs the flag.Visit function, which uses a given function (would this be a closure/or anonymous function) for each flag.  
-//    It then runs through each flag in lexigraphical order (alphabetical) and only to ones that have been set and then does a switch statement to match the argument given and assigns it 
+//    Next it checks, if there are any extra arguments besides the executable given, if not print out the Usage/Help section (descriptions).
+//    Next it runs the flag.Visit function, which uses a given function (would this be a closure/or anonymous function?) for each flag given/set.  
+//    It then runs through each flag in lexigraphical order (alphabetical) and then does a switch statement to match the argument given and assigns it 
 //    to the appOpt variable which is then given in the main function to run that specified function.
 func processCmdLineFlags() (AppOptType, error) {
 	flag.StringVar(&dbFileNameFlag, "db", "./data/todo.json", "Name of the database file")
