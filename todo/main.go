@@ -7,6 +7,8 @@ import (
 	"os"
 
 	"drexel.edu/todo/db"
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 // Global variables to hold the command line flags to drive the todo CLI
@@ -46,36 +48,36 @@ const (
 //		 flags.  The flag package is not very flexible and can lead to
 //		 some confusing code.
 
-//			 REQUIRED:     Study the code below, and make sure you understand
-//						   how it works.  Go online and readup on how the
-//						   flag package works.  Then, write a nice comment
-//				  		   block to document this function that highights that
-//						   you understand how it works.
+//				 REQUIRED:     Study the code below, and make sure you understand
+//							   how it works.  Go online and readup on how the
+//							   flag package works.  Then, write a nice comment
+//					  		   block to document this function that highights that
+//							   you understand how it works.
 //
-//			 EXTRA CREDIT: The best CLI and command line processor for
-//						   go is called Cobra.  Refactor this function to
-//						   use it.  See github.com/spf13/cobra for information
-//						   on how to use it.
+//				 EXTRA CREDIT: The best CLI and command line processor for
+//							   go is called Cobra.  Refactor this function to
+//							   use it.  See github.com/spf13/cobra for information
+//							   on how to use it.
 //
-//	 YOUR ANSWER: First this package sets up command line arguments that are potentially expected to be passed through (-db, -restore, -l (list), etc)
-//    For instance flag.StringVar(), gives the varialbe to assign the passed in value, the name to call, a default value (.data/todo.json),
-//    if nothing is passed in and a description to print out for a help.  It does that for other variable names and types.
-//    Next it checks, if there are any extra arguments besides the executable given, if not print out the Usage/Help section (descriptions).
-//    Next it runs the flag.Visit function, which uses a given function (would this be a closure/or anonymous function?) for each flag given/set.  
-//    It then runs through each flag in lexigraphical order (alphabetical) and then does a switch statement to match the argument given and assigns it 
-//    to the appOpt variable which is then given in the main function to run that specified function.
+//		 YOUR ANSWER: First this package sets up command line arguments that are potentially expected to be passed through (-db, -restore, -l (list), etc)
+//	   For instance flag.StringVar(), gives the varialbe to assign the passed in value, the name to call, a default value (.data/todo.json),
+//	   if nothing is passed in and a description to print out for a help.  It does that for other variable names and types.
+//	   Next it checks, if there are any extra arguments besides the executable given, if not print out the Usage/Help section (descriptions).
+//	   Next it runs the flag.Visit function, which uses a given function (would this be a closure/or anonymous function?) for each flag given/set.
+//	   It then runs through each flag in lexigraphical order (alphabetical) and then does a switch statement to match the argument given and assigns it
+//	   to the appOpt variable which is then given in the main function to run that specified function.
 func processCmdLineFlags() (AppOptType, error) {
-	flag.StringVar(&dbFileNameFlag, "db", "./data/todo.json", "Name of the database file")
-	flag.BoolVar(&restoreDbFlag, "restore", false, "Restore the database from the backup file")
-	flag.BoolVar(&listFlag, "l", false, "List all the items in the database")
-	flag.IntVar(&queryFlag, "q", 0, "Query an item in the database")
-	flag.StringVar(&addFlag, "a", "", "Add an item to the database")
-	flag.StringVar(&updateFlag, "u", "", "Update an item in the database")
-	flag.IntVar(&deleteFlag, "d", 0, "Delete an item from the database")
-	flag.BoolVar(&itemStatusFlag, "s", false, "Change item 'done' status to true or false")
 
-	flag.Parse()
-
+	myCmd := &cobra.Command{}
+	myCmd.Flags().StringVar(&dbFileNameFlag, "db", "./data/todo.json", "Name of the database file")
+	myCmd.Flags().BoolVarP(&restoreDbFlag, "restore", "r", false, "Restore the database from the backup file")
+	myCmd.Flags().BoolVarP(&listFlag, "l", "l", false, "List all the items in the database")
+	myCmd.Flags().IntVarP(&queryFlag, "q", "q", 0, "Query an item in the database")
+	myCmd.Flags().StringVarP(&addFlag, "a", "a", "", "Add an item to the database")
+	myCmd.Flags().StringVarP(&updateFlag, "u", "u", "", "Update an item in the database")
+	myCmd.Flags().IntVarP(&deleteFlag, "d", "d", 0, "Delete an item from the database")
+	myCmd.Flags().BoolVarP(&itemStatusFlag, "s", "s", false, "Change item 'done' status to true or false")
+	myCmd.Execute()
 	var appOpt AppOptType = INVALID_APP_OPT
 
 	//show help if no flags are set
@@ -86,11 +88,11 @@ func processCmdLineFlags() (AppOptType, error) {
 
 	// Loop over the flags and check which ones are set, set appOpt
 	// accordingly
-	flag.Visit(func(f *flag.Flag) {
+	myCmd.Flags().Visit(func(f *pflag.Flag) {
 		switch f.Name {
 		case "l":
 			appOpt = LIST_DB_ITEM
-		case "restore":
+		case "restore", "r":
 			appOpt = RESTORE_DB_ITEM
 		case "q":
 			appOpt = QUERY_DB_ITEM
