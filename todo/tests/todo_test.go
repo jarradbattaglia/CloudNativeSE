@@ -73,11 +73,16 @@ func TestAddHardCodedItem(t *testing.T) {
 	//I will get you started, uncomment the lines below to add to the DB
 	//and ensure no errors:
 	//---------------------------------------------------------------
-	//err := DB.AddItem(item)
-	//assert.NoError(t, err, "Error adding item to DB")
+	err := DB.AddItem(item)
+	assert.NoError(t, err, "Error adding item to DB")
 
 	//TODO: Now finish the test case by looking up the item in the DB
 	//and making sure it matches the item that you put in the DB above
+	retrievedItem, err := DB.GetItem(item.Id)
+	assert.NoError(t, err, "Retrieved item without error")
+	assert.Equal(t, retrievedItem.Id,  item.Id, "Item IDs are the same")
+	assert.Equal(t, retrievedItem.IsDone,  item.IsDone, "Item IsDone are the same")
+	assert.Equal(t, retrievedItem.Title,  item.Title, "Item Titles are the same")
 }
 
 func TestAddRandomStructItem(t *testing.T) {
@@ -90,6 +95,15 @@ func TestAddRandomStructItem(t *testing.T) {
 	assert.NoError(t, err, "Created fake item OK")
 
 	//TODO: Complete the test
+	addErr := DB.AddItem(item)
+	assert.NoError(t, addErr, "Successfully added fake item")
+
+	retrievedItem, err := DB.GetItem(item.Id)
+	assert.NoError(t, err, "Retrieved item without error")
+	assert.Equal(t, retrievedItem.Id,  item.Id, "Item IDs are the same")
+	assert.Equal(t, retrievedItem.IsDone,  item.IsDone, "Item IsDone are the same")
+	assert.Equal(t, retrievedItem.Title,  item.Title, "Item Titles are the same")
+
 }
 
 func TestAddRandomItem(t *testing.T) {
@@ -101,6 +115,15 @@ func TestAddRandomItem(t *testing.T) {
 	}
 
 	t.Log("Testing Adding an Item with Random Fields: ", item)
+	
+	addErr := DB.AddItem(item)
+	assert.NoError(t, addErr, "Successfully added fake item")
+
+	retrievedItem, err := DB.GetItem(item.Id)
+	assert.NoError(t, err, "Retrieved random item without error")
+	assert.Equal(t, retrievedItem.Id,  item.Id, "Random Item IDs are the same")
+	assert.Equal(t, retrievedItem.IsDone,  item.IsDone, "Random Item IsDone are the same")
+	assert.Equal(t, retrievedItem.Title,  item.Title, "Random Item Titles are the same")
 
 }
 
@@ -109,10 +132,75 @@ func TestAddRandomItem(t *testing.T) {
 // and then implment them later.  The go testing framework provides a
 // Skip() function that just tells the testing framework to skip or ignore
 // this test function
-func TestAddPlaceholderTest(t *testing.T) {
-	t.Skip("Placeholder test not implemented yet")
-}
+
 
 //TODO: Create additional tests to showcase the correct operation of your program
 //for example getting an item, getting all items, updating items, and so on. Be
 //creative here.
+
+func TestGetAllItems(t *testing.T) {
+	items, allItemsErr := DB.GetAllItems()
+	t.Log("Retrieving all items from database and ensuring it is expected lenght")
+
+	assert.NoError(t, allItemsErr, "Retrieved items successfully")
+
+	assert.NoError(t, allItemsErr, "No errors retrieving all items")
+	assert.Equal(t, len(items), 7, "Length of items expected length of 4")
+}
+
+func TestRetrieveItem(t *testing.T) {
+	retrievedItem, err := DB.GetItem(1)
+	t.Log("Testing Retrieving Expected Item: ", retrievedItem)
+
+	assert.NoError(t, err, "Retrieved random item without error")
+
+	assert.Equal(t, retrievedItem.Id,  1, "Item IDs is expected")
+	assert.Equal(t, retrievedItem.IsDone,  false, "Item IsDone is expected")
+	assert.Equal(t, retrievedItem.Title,  "Learn Go / GoLang", "Item title is expected")
+
+}
+func TestUpdateItemToTrue(t *testing.T) {
+	item, getItemErr := DB.GetItem(1)
+	t.Log("Testing Item Update to IsDone from False to True: ", item)
+
+	assert.NoError(t, getItemErr, "Retrieved item 1 successfully")
+
+	assert.Equal(t, item.IsDone, false, "Item by default is false")
+	item.IsDone = true
+	DB.UpdateItem(item)
+	retrievedItem, getItemAgainErr := DB.GetItem(1)
+	assert.NoError(t, getItemAgainErr, "Retrieved Item 1 successfully again")
+
+	assert.Equal(t, retrievedItem.IsDone, true, "Successfully set item 1 to true")
+}
+
+func TestChangeItemStatus(t *testing.T) {
+	newItem := db.ToDoItem{
+		Id:     1000,
+		Title:  "TestTitle",
+		IsDone: false,
+	}
+	t.Log("Testing Item Update to IsDone from False to True using function: ", newItem)
+
+	DB.AddItem(newItem)
+
+	item, getItemErr := DB.GetItem(1000)
+	assert.NoError(t, getItemErr, "Retrieved item 1000 successfully")
+	assert.Equal(t, item.IsDone, false, "Item by default is false as expected")
+
+	DB.ChangeItemDoneStatus(1000, true)
+	changedItem, getChangedItemErr := DB.GetItem(1000)
+	assert.NoError(t, getChangedItemErr, "Retrieved item 1000 successfully")
+	assert.Equal(t, changedItem.IsDone, true, "Item by default is false as expected")
+
+}
+
+func TestDeleteItem(t *testing.T) {
+	t.Log("Testing deleting item 1000 from previous step")
+	_, err := DB.GetItem(1000)
+	assert.NoError(t, err, "Retrieved item successfully")
+	DB.DeleteItem(1000)
+	_, getItemErr := DB.GetItem(1000)
+	assert.Error(t, getItemErr, "Expected to get error as item no longer exists")	
+}
+

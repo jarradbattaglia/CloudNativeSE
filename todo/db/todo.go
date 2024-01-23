@@ -162,7 +162,10 @@ func (t *ToDo) AddItem(item ToDoItem) error {
 		return errors.New("The value for " + strconv.Itoa(item.Id)+ " already exists in database.  Use update instead!")
 	}
 	t.toDoMap[item.Id] = item
-	t.saveDB()
+	saveErr := t.saveDB()
+	if saveErr != nil {
+		return saveErr
+	}
 	return nil
 }
 
@@ -196,12 +199,15 @@ func (t *ToDo) DeleteItem(id int) error {
 	if errLoad != nil {
 		return errLoad
 	}
-	_, err := t.toDoMap[id]
-	if err {
+	_, ok := t.toDoMap[id]
+	if !ok {
 		return errors.New("The item with ID " + strconv.Itoa(id) + " does not exist and cannot be deleted")
 	}
 	delete(t.toDoMap, id)
-	t.saveDB()
+	saveErr := t.saveDB()
+	if saveErr != nil {
+		return saveErr
+	}
 	return nil
 }
 
@@ -234,12 +240,15 @@ func (t *ToDo) UpdateItem(item ToDoItem) error {
 	if errLoad != nil {
 		return errLoad
 	}
-	_, err := t.toDoMap[item.Id]
-	if err {
+	_, ok := t.toDoMap[item.Id]
+	if !ok {
 		return errors.New("The item with ID " + strconv.Itoa(item.Id) + " does not exist and cannot be updated")
 	}
 	t.toDoMap[item.Id] = item
-	t.saveDB()
+	saveErr := t.saveDB()
+	if saveErr != nil {
+		return saveErr
+	}
 	return nil
 }
 
@@ -273,8 +282,10 @@ func (t *ToDo) GetItem(id int) (ToDoItem, error) {
 	if errLoad != nil {
 		return ToDoItem{} , errLoad
 	}
-	_, err := t.toDoMap[id]
-	if err {
+
+	_, ok := t.toDoMap[id]
+	
+	if !ok {
 		return ToDoItem{}, errors.New("The item with ID " + strconv.Itoa(id) + " does not exist and cannot be retrieved")
 	}
 	
@@ -380,10 +391,14 @@ func (t *ToDo) ChangeItemDoneStatus(id int, value bool) error {
 	if err != nil {
 		return err
 	}
+
 	item.IsDone = value
-	t.UpdateItem(item)
-	t.saveDB()
-	return errors.New("ChangeItemDoneStatus() is currently not implemented")
+	updateErr := t.UpdateItem(item)
+	if updateErr != nil {
+		return updateErr
+	}
+	fmt.Println("Successfully changed the item status of Item ID: " + strconv.Itoa(item.Id) + " to " + strconv.FormatBool(value))
+	return nil
 }
 
 //------------------------------------------------------------

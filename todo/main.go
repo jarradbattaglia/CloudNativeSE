@@ -62,7 +62,7 @@ const (
 //    if nothing is passed in and a description to print out for a help.  It does that for other variable names and types.
 //    Next it checks for if there are any extra arguments besides the executable given, if not print out the Usage/Help section (descriptions).
 //    Next it runs the flag.Visit function, which uses a given function (would this be a closure/or anonymous function) for each flag.  
-//    It then runs through each flag in lexigraphical order (alphabetical) and then does a switch statement to match the argument given and assigns it 
+//    It then runs through each flag in lexigraphical order (alphabetical) and only to ones that have been set and then does a switch statement to match the argument given and assigns it 
 //    to the appOpt variable which is then given in the main function to run that specified function.
 func processCmdLineFlags() (AppOptType, error) {
 	flag.StringVar(&dbFileNameFlag, "db", "./data/todo.json", "Name of the database file")
@@ -75,7 +75,7 @@ func processCmdLineFlags() (AppOptType, error) {
 	flag.BoolVar(&itemStatusFlag, "s", false, "Change item 'done' status to true or false")
 
 	flag.Parse()
-	fmt.Print(os.Args)
+
 	var appOpt AppOptType = INVALID_APP_OPT
 
 	//show help if no flags are set
@@ -115,7 +115,14 @@ func processCmdLineFlags() (AppOptType, error) {
 		case "s":
 			//For extra credit you will need to change some things here
 			//and also in main under the CHANGE_ITEM_STATUS case
-			appOpt = CHANGE_ITEM_STATUS
+			if appOpt == QUERY_DB_ITEM {
+				appOpt = CHANGE_ITEM_STATUS
+			} else {
+				// If query db item isnt set then this wont be valid
+				fmt.Println("Need to use -q as well when trying to change status")
+				appOpt = INVALID_APP_OPT
+			}
+
 		default:
 			appOpt = INVALID_APP_OPT
 		}
@@ -219,9 +226,11 @@ func main() {
 	case CHANGE_ITEM_STATUS:
 		//For the CHANGE_ITEM_STATUS extra credit you will also
 		//need to add some code here
-		fmt.Println("Running CHANGE_ITEM_STATUS...")
-		fmt.Println("Not implemented yet, but it can be for extra credit")
-		fmt.Println("Ok")
+		err := todo.ChangeItemDoneStatus(queryFlag, itemStatusFlag)
+		if err != nil {
+			fmt.Println("Error: ", err)
+			break
+		}
 	default:
 		fmt.Println("INVALID_APP_OPT")
 	}
