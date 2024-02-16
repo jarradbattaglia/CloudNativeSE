@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"drexel.edu/todo/api"
+	"drexel.edu/voterapi/api"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/recover"
@@ -53,29 +53,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	//HTTP Standards for "REST" APIS
-	//GET - Read/Query
-	//POST - Create
-	//PUT - Update
-	//DELETE - Delete
+	app.Get("/voters", apiHandler.GetAllVoters)
+	app.Post("/voters/:id<uint>", apiHandler.AddVoter)
+	app.Get("/voters/:id<uint>", apiHandler.GetVoterById)
+	app.Get("/voters/:id<uint>/polls", apiHandler.GetPollsByVoterId)
+	app.Post("/voters/:id<uint>/polls/:pollid<uint>", apiHandler.AddPollForVoter)
+	app.Get("/voters/:id<uint>/polls/:pollid<uint>", apiHandler.GetPollByPollId)
+	app.Delete("/voters/:id<uint>", apiHandler.DeleteVoter)
+	app.Delete("/voters/:id<uint>/polls/:pollid<uint>", apiHandler.DeletePollForVoter)
+	app.Get("/voters/:health", apiHandler.GetHealth)
 
-	app.Get("/todo", apiHandler.ListAllTodos)
-	app.Post("/todo", apiHandler.AddToDo)
-	app.Put("/todo", apiHandler.UpdateToDo)
-	app.Delete("/todo", apiHandler.DeleteAllToDo)
-	app.Delete("/todo/:id<int>", apiHandler.DeleteToDo)
-	app.Get("/todo/:id<int>", apiHandler.GetToDo)
-
-	app.Get("/crash", apiHandler.CrashSim)
-	app.Get("/crash2", apiHandler.CrashSim2)
-	app.Get("/crash3", apiHandler.CrashSim3)
-	app.Get("/health", apiHandler.HealthCheck)
-
-	//We will now show a common way to version an API and add a new
-	//version of an API handler under /v2.  This new API will support
-	//a path parameter to search for todos based on a status
-	v2 := app.Group("/v2")
-	v2.Get("/todo", apiHandler.ListSelectTodos)
 
 	serverPath := fmt.Sprintf("%s:%d", hostFlag, portFlag)
 	log.Println("Starting server on ", serverPath)

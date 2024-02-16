@@ -7,14 +7,14 @@ import (
 	"os"
 	"strconv"
 
-	"drexel.edu/todo/db"
+	"drexel.edu/voterapi/voters"
 	"github.com/gofiber/fiber/v2"
 )
 
 // The api package creates and maintains a reference to the data handler
 // this is a good design practice
-type ToDoAPI struct {
-	db *db.ToDo
+type VoterAPI struct {
+	votorList *voters.VoterList
 }
 
 func New() (*ToDoAPI, error) {
