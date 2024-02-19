@@ -31,8 +31,8 @@ func processCmdLineFlags() {
 	//the address 0.0.0.0 instructs the network stack to listen on all interfaces
 	//We set this up as a flag so that we can overwrite it on the command line if
 	//needed
-	flag.StringVar(&hostFlag, "h", "0.0.0.0", "Listen on all interfaces")
-	flag.UintVar(&portFlag, "p", 1080, "Default Port")
+	flag.StringVar(&hostFlag, "h", "localhost", "Listen on all interfaces")
+	flag.UintVar(&portFlag, "p", 8080, "Default Port")
 
 	flag.Parse()
 }
@@ -52,8 +52,8 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-
 	app.Get("/voters", apiHandler.GetAllVoters)
+	app.Get("/voters/populate", apiHandler.Populate)
 	app.Post("/voters/:id<uint>", apiHandler.AddVoter)
 	app.Get("/voters/:id<uint>", apiHandler.GetVoterById)
 	app.Get("/voters/:id<uint>/polls", apiHandler.GetPollsByVoterId)
@@ -61,8 +61,9 @@ func main() {
 	app.Get("/voters/:id<uint>/polls/:pollid<uint>", apiHandler.GetPollByPollId)
 	app.Delete("/voters/:id<uint>", apiHandler.DeleteVoter)
 	app.Delete("/voters/:id<uint>/polls/:pollid<uint>", apiHandler.DeletePollForVoter)
-	app.Get("/voters/:health", apiHandler.GetHealth)
-
+	app.Put("/voters/:id<uint>", apiHandler.UpdateVoter)
+	app.Put("/voters/:id<uint>/polls/:pollid<uint>", apiHandler.UpdateVoterPoll)
+	app.Get("/health", apiHandler.HealthCheck)
 
 	serverPath := fmt.Sprintf("%s:%d", hostFlag, portFlag)
 	log.Println("Starting server on ", serverPath)
