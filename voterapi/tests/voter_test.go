@@ -27,6 +27,10 @@ func TestMain(m *testing.M) {
 	code := m.Run()
 
 	//CLEANUP
+	for i := 0; i < 10; i++ {
+		url := fmt.Sprintf("%v/voters/%v", BASE_API, i)
+		cli.R().Delete(url)
+	}
 
 	//Now Exit
 	os.Exit(code)	
