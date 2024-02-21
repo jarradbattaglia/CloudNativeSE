@@ -95,6 +95,16 @@ func (vAPI *VoterAPI) AddVoter(c *fiber.Ctx) error {
 		log.Println("Error binding JSON: ", err)
 		return fiber.NewError(http.StatusBadRequest)
 	}
+
+	voterId, err := c.ParamsInt("id")
+	if err != nil {
+		return fiber.NewError(http.StatusBadRequest)
+	}
+
+	if voter.VoterId != voterId {
+		return fiber.NewError(http.StatusBadRequest)
+	}
+
 	if err := vAPI.voterList.AddVoter(voter); err != nil {
 		log.Println("Error adding item: ", err)
 		return fiber.NewError(http.StatusInternalServerError)
@@ -126,6 +136,15 @@ func (vAPI *VoterAPI) AddPollForVoter(c *fiber.Ctx) error {
 
 	voterId, err := c.ParamsInt("id")
 	if err != nil {
+		return fiber.NewError(http.StatusBadRequest)
+	}
+
+	pollId, err := c.ParamsInt("pollid")
+	if err != nil {
+		return fiber.NewError(http.StatusBadRequest)
+	}
+
+	if voterHistory.PollId != pollId {
 		return fiber.NewError(http.StatusBadRequest)
 	}
 
@@ -163,7 +182,6 @@ func (vAPI *VoterAPI) DeleteVoter(c *fiber.Ctx) error {
 	if err != nil {
 		return fiber.NewError(http.StatusInternalServerError)
 	}
-
 	return c.SendString(fmt.Sprintf("VoterId %v has been removed", voterId))
 }	
 
@@ -187,10 +205,21 @@ func (vAPI *VoterAPI) DeletePollForVoter(c *fiber.Ctx) error {
 
 func (vAPI *VoterAPI) UpdateVoter(c *fiber.Ctx) error {
 	var voter voters.Voter
+	
 	if err := c.BodyParser(&voter); err != nil {
 		log.Println("Error binding JSON: ", err)
 		return fiber.NewError(http.StatusBadRequest)
 	}
+
+	voterId, err := c.ParamsInt("id")
+	if err != nil {
+		return fiber.NewError(http.StatusBadRequest)
+	}
+
+	if voter.VoterId != voterId {
+		return fiber.NewError(http.StatusBadRequest)
+	}
+
 	if err := vAPI.voterList.UpdateVoter(voter); err != nil {
 		log.Println("Error adding item: ", err)
 		return fiber.NewError(http.StatusInternalServerError)
@@ -206,6 +235,19 @@ func (vAPI *VoterAPI) UpdateVoterPoll(c *fiber.Ctx) error {
 	}
 
 	voterId, err := c.ParamsInt("id")
+	if err != nil {
+		return fiber.NewError(http.StatusBadRequest)
+	}
+
+	pollId, err := c.ParamsInt("pollid")
+	if err != nil {
+		return fiber.NewError(http.StatusBadRequest)
+	}
+
+	if voterHistory.PollId != pollId {
+		return fiber.NewError(http.StatusBadRequest)
+	}
+
 	if err != nil {
 		return fiber.NewError(http.StatusBadRequest)
 	}

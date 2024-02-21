@@ -160,13 +160,27 @@ func Test_DeleteVoterHistory(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, 200, rsp.StatusCode())
 	assert.Equal(t, 1, len(voter.VoteHistory))
+
+	// Another delete should throw internal error
+	url = fmt.Sprintf("%v/voters/%v/polls/%v", BASE_API, 6, 7)
+	rsp, err = cli.R().Delete(url)
+	assert.Nil(t, err)
+	assert.Equal(t, 500, rsp.StatusCode())
 }
+
 func Test_DeleteVoter(t *testing.T) {
 	url := fmt.Sprintf("%v/voters/%v", BASE_API, 6)
 	rsp, err := cli.R().Delete(url)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 200, rsp.StatusCode())
+
+	// Another delete should throw internal error
+	url = fmt.Sprintf("%v/voters/%v", BASE_API, 6)
+	rsp, err = cli.R().Delete(url)
+
+	assert.Nil(t, err)
+	assert.Equal(t, 500, rsp.StatusCode())
 }
 
 func Test_UpdateVoter(t *testing.T) {

@@ -7,10 +7,11 @@ Extra credit parts 1 and 2 were done, (json and puts/deletes)
 But run in one tab:
 
 ```
+go build
 go run .
 ```
 
-and then run `go test ./... -v. ` to run the test suite.
+and then run `go test ./... -v ` to run the test suite.
 
 Which will start up a bare server (with no info), you may run /voters/populate to give some hard coded data.
 
