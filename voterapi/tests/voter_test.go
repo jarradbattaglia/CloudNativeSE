@@ -183,6 +183,34 @@ func Test_DeleteVoter(t *testing.T) {
 	assert.Equal(t, 500, rsp.StatusCode())
 }
 
+func Test_AddBadVoter(t *testing.T) {
+	voter := voters.Voter{
+		VoterId: 1,
+		Name: "Tester Test",
+		Email: "Test1@example.com",
+		VoteHistory: make([]voters.VoterHistory, 0),
+	}
+	url := fmt.Sprintf("%v/voters/%v", BASE_API, 2)
+	rsp, err := cli.R().SetBody(voter).Post(url)
+
+	assert.Nil(t, err)
+	assert.Equal(t, 400, rsp.StatusCode())
+
+}
+
+func Test_AddBadVoterHistory(t *testing.T) {
+	voteHistory := voters.VoterHistory{
+		PollId: 0,
+		VoteId: 100,
+		VoteDate: time.Now(),
+	}
+	url := fmt.Sprintf("%v/voters/%v/polls/4", BASE_API, 2)
+	rsp, err := cli.R().SetBody(voteHistory).Post(url)
+
+	assert.Nil(t, err)
+	assert.Equal(t, 400, rsp.StatusCode())
+}
+
 func Test_UpdateVoter(t *testing.T) {
 	voter := voters.Voter{
 		VoterId: 1,
