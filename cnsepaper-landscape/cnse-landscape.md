@@ -10,3 +10,7 @@ I found the following <FILL-IN-THE-BLANK> contribution from the paper the most i
 ```
 
 ## Answer
+
+The most interesting aspect of the article I found was in section 4-A when speaking of the different hardware diversity that the move to cloud and the edge will require.  And I think it is interesting when thinking of how currently I think in RAM/CPU/Storage terms, but not really caring about the hardware when I work.  But as things start progressing and more and more things move to the cloud and certain workloads become better with specific hardware, how will my workloads need to change.  Because i do work on machine learning and data science projects at work (i lead a logging analytics aggregation team) and we are thinking of what gpus could do things better and testing with buying hardware.  And I think it is interesting how this will progress and what different workloads for specific chips will be leveraged in the future.
+
+Also this aspect, plus the selection of programming languages talked about in polyglot programming i think will be required in the future for software engineers and testing will be needed for many of these aspects, so knowledge of what tools are available from specific providers, what chips do they make, what machines or cost of those are.  That knowledge will need to be known by many engineers and just another aspect of engineering will need to be thought of when moving to the cloud/using the cloud.
