@@ -1,3 +1,24 @@
+# How to run (makefile)
+
+```
+make docker-build
+make run-docker-compose
+make run-tests
+```
+
+CLEANUP (cleans go cache for tests, if thats a problem for you)
+
+```
+make cleanup-cache
+```
+
+CLEANUP (deletes background docker images if using )
+
+```
+make cleanup
+```
+
+
 # How to run
 
 This program will use a redis cache to store information.
