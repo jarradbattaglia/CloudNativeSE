@@ -16,3 +16,22 @@ and then run `go test ./... -v ` to run the test suite.
 Which will start up a bare server (with no info), you may run /voters/populate to give some hard coded data.
 
 But dont need to do that! test will delete all data on start and cleanup and runs through each call once
+
+
+Or
+
+```
+make build
+make run
+```
+Different tab
+```
+make run-tests 
+```
+
+Populate test data
+```
+make populate
+make get-voters
+```
+
