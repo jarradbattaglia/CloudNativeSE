@@ -44,3 +44,11 @@ docker-build-multi-builder:
 .PHONY: docker-build-multi-image
 docker-build-multi-image:
 	docker buildx build --platform linux/arm/v7,linux/arm64/8,linux/amd64 --builder multi-builder --push  -t maddchickenz/battaglialab_voterapi:latest .
+
+.PHONY: get-voters
+get-voters:
+	curl -H "Content-Type: application/json" -X GET http://localhost:8080/voters/
+
+.PHONY: populate
+populate:
+	curl -H "Content-Type: application/json" -X GET http://localhost:8080/voters/populate

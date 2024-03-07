@@ -6,6 +6,13 @@ make run-docker-compose
 make run-tests
 ```
 
+TEST DATA (when docker compose is running) - this implements test data to show it working
+```
+make get-voters
+make populate
+make get-voters
+```
+
 CLEANUP (cleans go cache for tests, if thats a problem for you)
 
 ```
