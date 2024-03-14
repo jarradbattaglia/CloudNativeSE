@@ -51,8 +51,9 @@ Next the votes API change would do something similar with its 3 ids that it carr
     "value": 7
     "links": [
       { "rel": "self", "href": /votes/1 }
-      { "rel": "voter", "href": /voters/123 }
-      { "rel": "poll", "href": /polls/2 }
+      { "rel": "voter_info", "href": /voters/123 }
+      { "rel": "poll_info", "href": /polls/2 }
+      { "rel": "voter_history", "href": /voters/123/polls/2 } # maybe shown if vote is already done?/or did a get
       {"rel": "register_vote", "href": "/voters/123/polls", "hint": "post"} # would exist if we did a POST
     ]
   }, ... 
@@ -81,11 +82,17 @@ Next up I'll do an example of the Polls API, which really only has POSTs to do (
 
 This would tell the user that you can create a vote or get available voters info from each of those endpoints, and maybe can be enhanced with having knowledge of if you just did a GET to do 
 
+In summary:
+
+The flow of the application would ideally be the same as described in the prompt, but the user wouldn't need to keep checking a Swagger or documentation.  If I call POST to /voters, I would create my voter and get a link to create a poll perhaps or create a vote, if I decided to do one of them, for instance i created a poll.  I would then be given the option to add a vote through the links section of the json, when I would POST a new vote i would be given a relation to `register vote` and finally doing the POST to `/voters/123/polls` to mark my vote in the voter history. Also depending on how we design the votes api to lookup polls and voters information, that information could be added to each output as well.
+
+
 Now a lot of this can be improved by reading the database or similar behind the scenes calls to get the state of the application or user in a more traditional programming (to get if voter voted on a poll or not and giving right link, or deleting a poll, etc, which would change some links given in a more complex application).  But at the bare minimum we could provide more info to the user on what calls can be used in relation to what they just called as described above, for instance if I just did a post on a Voter my links might have the self link, a hint to create a vote with POST, and a get of polls that they could vote on.  
+
 
 References I looked at:
 
-https://www.infoq.com/articles/hypermedia-api-tutorial-part-one/
-https://blogs.mulesoft.com/dev-guides/api-design/api-best-practices-hypermedia-part-1/
-https://apisyouwonthate.com/blog/common-hypermedia-patterns-with-json-hyper-schema/
-https://www.mscharhag.com/api-design/hypermedia-rest
+- https://www.infoq.com/articles/hypermedia-api-tutorial-part-one/
+- https://blogs.mulesoft.com/dev-guides/api-design/api-best-practices-hypermedia-part-1/
+- https://apisyouwonthate.com/blog/common-hypermedia-patterns-with-json-hyper-schema/
+- https://www.mscharhag.com/api-design/hypermedia-rest
