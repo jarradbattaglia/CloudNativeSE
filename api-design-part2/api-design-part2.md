@@ -21,7 +21,7 @@ Provide at least 2 references that you found helpful during this activity. Note 
 
 How I would approach this API using hypermedia links is using links more in the calls as stated in the Google video we've looked at before, but also showing resources that the API can use and move to.
 
-For instance the GET /voters/123 api might return something like:
+For instance the `GET /voters/123` api might return something like:
 
 ```
 {
@@ -31,16 +31,16 @@ For instance the GET /voters/123 api might return something like:
   "vote_history": [list_of_votes_structure (use url for ids of polls) like /polls/456 if they voted here]
   "links": [
       { "ref": "self", "href": "/voters/123",  }
-      {"ref": "voter_history", "href" "/voters/123/polls",}
-      {"ref": "add_vote", "href": "/votes", } 
+      {"ref": "add_vote", "href" "/voters/123/polls",}
+      {"ref": "register_vote", "href": "/votes", } 
       {"ref": "polls", "href": "/polls" }
   ]
 }
 ```
 
-We use the uniform API from the google cloud video to give the client more information everywhere! First the ID needs to print out its own path as thats something we can look up and most hypermedia seems to also have a "self", but also for something like the voters, they may want to get the polls they have voted on and the place where they can vote on a poll.
+We use the uniform API from the google cloud video to give the client more information about the API at any place, where that info could be used! First the ID needs to print out its own path as thats something we can look up and most hypermedia seems to also have a "self" reference in its links section. But also for something like the voters, they may want to get the polls they have voted on, the place where they can vote on a poll, or add a vote registration (`/votes`). Now also in hypermedia, the state and flow of what the user is doing changes what gets returned, for instance if we deleted a resource, instead of returning self, we could do `add_voter` or something similar (more complex application might do things like this better).
 
-Next the votes API change would do something similar with its 3 ids that it carries, say i retrieved a list of votes done (`GET /votes`), it might look like the below:
+Next the votes API change would do something similar with its 3 ids that it carries, say i retrieved a list of votes registered (`GET /votes`), it might look like the below:
 
 ```
 [
@@ -60,9 +60,9 @@ Next the votes API change would do something similar with its 3 ids that it carr
 ]
 ```
 
-This allows the user to see more information about the relationship of votes, I can find the poll info, voter info, and the link to register the vote with the voter id. Also (if we wanted to expand) we could add a pagination token to GET calls throughout each API, but not POSTs, so we dont need to send back EVERY resource, and can limit or allow the user to go to next page, or add hints to the refernce name (like GET/POST/PATCH) to each link.  This all helps the user use the API intuitevely, but also requires a decent amount of work in backend to know and correlate what the user is doing.
+This allows the user to see more information about the relationship of votes, I can find the poll info, voter info, and the link to register the vote with the voter id. Also (if we wanted to expand) we could add a pagination token to GET calls throughout each API that does a GET all call, so we dont need to send back EVERY resource, and can limit or allow the user to go to next page.  Also we could add hints to the reference name (like GET/POST/PATCH) to each link and the link reference could be more descriptive like add_vote or get_votes, etc.  Things like this all helps the user use the API intuitevely, but also requires a decent amount of work in backend to know and correlate what the user is doing.  
 
-Next up I'll do an example of the Polls API, which really only has POSTs to do (so if I did a GET /polls or POST /polls, i might return:
+Next up I'll do an example of the Polls API, so if I did a GET /polls or POST /polls, i might return:
 
 ```
 {
@@ -73,6 +73,7 @@ Next up I'll do an example of the Polls API, which really only has POSTs to do (
   "links": [
     { "rel": "self", "href": /polls/2 }
     { 'rel': "get_voters_info", "href": "/voters"}
+    { 'rel': "get_voted_polls", "href": "/votes?polls=<poll_id>"}
     { 'rel': "register_vote", "href": "/votes"} 
   ]
 
@@ -80,14 +81,15 @@ Next up I'll do an example of the Polls API, which really only has POSTs to do (
 
 ```
 
-This would tell the user that you can create a vote or get available voters info from each of those endpoints, and maybe can be enhanced with having knowledge of if you just did a GET to do 
+This would tell the user that you can create a vote or get available voters info from each of those endpoints.  In a further use of this application doing something like implementing a search function would be able to enhance many of these APIs.  For instance being able to do something like `votes/pollId=<pollId>` to find votes that have used this pollId, would greatly benefit an application like this and the other APIs.
 
 In summary:
 
-The flow of the application would ideally be the same as described in the prompt, but the user wouldn't need to keep checking a Swagger or documentation.  If I call POST to /voters, I would create my voter and get a link to create a poll perhaps or create a vote, if I decided to do one of them, for instance i created a poll.  I would then be given the option to add a vote through the links section of the json, when I would POST a new vote i would be given a relation to `register vote` and finally doing the POST to `/voters/123/polls` to mark my vote in the voter history. Also depending on how we design the votes api to lookup polls and voters information, that information could be added to each output as well.
+I think the features that benefit the most for changing the API, is adding the API url to each Id (or where usable), adding the ability to do a search in GET calls, and obviously adding helpful links to calls to help guide the user (even if mostly static).
 
+The flow of the application would ideally be the same as described in the prompt, but the user wouldn't need to keep checking a Swagger or documentation.  If I call POST to `/voters`, I would create my voter and get a link to create a poll perhaps or create a vote, if I decided to do one of them, for instance i created a poll.  I would then be given the option to add a vote through the links section of the json, when I would POST a new vote i would be given a relation to `register vote` and finally doing the POST to `/voters/123/polls` to mark my vote in the voter history. Also depending on how we design the votes api to lookup polls and voters information, that information could be added to each output as well (search or just a specific endpoint).
 
-Now a lot of this can be improved by reading the database or similar behind the scenes calls to get the state of the application or user in a more traditional programming (to get if voter voted on a poll or not and giving right link, or deleting a poll, etc, which would change some links given in a more complex application).  But at the bare minimum we could provide more info to the user on what calls can be used in relation to what they just called as described above, for instance if I just did a post on a Voter my links might have the self link, a hint to create a vote with POST, and a get of polls that they could vote on.  
+Also a lot of this can be improved by reading the database or similar behind the scenes calls to get the state of the application or user in a more traditional programming (to get if voter voted on a poll or not and giving right link, or deleting a poll, etc, which would change some links given in a more complex application).  But at the bare minimum we could provide more info to the user on what calls can be used in relation to what they just called as described above.
 
 
 References I looked at:
